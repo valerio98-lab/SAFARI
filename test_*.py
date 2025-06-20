@@ -1,8 +1,8 @@
 import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-from denoisingAutoencoder import DenoisingAutoencoder
-from trainer import Trainer
+from uncertaintyNetwork import DenoisingAutoencoder
+from uncertaintyNetwork import UncertaintyTrainer
 
 
 @pytest.fixture
@@ -22,12 +22,12 @@ def setup_trainer():
         input_dim=state_dim, hidden_dim=hidden, noise_std=noise_std
     )
     optimizer = torch.optim.SGD(dae.parameters(), lr=1e-2)
-    trainer = Trainer(
+    trainer = UncertaintyTrainer(
         model=dae,
         optimizer=optimizer,
         dataloader=loader,
         epochs=3,
-        device=torch.device("cpu"),
+        device="cpu",
     )
     return dae, trainer, loader
 
