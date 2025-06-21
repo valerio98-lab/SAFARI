@@ -90,7 +90,7 @@ Feel free to open issues or pull requests for enhancements or bug fixes.
   journal = {arXiv preprint arXiv:2011.09586},
   year    = {2020},
   doi     = {10.48550/arXiv.2011.09586},
-  url     = {https://arxiv.org/abs/2011.09586}
+  url     = {[https://arxiv.org/abs/2011.09586](https://arxiv.org/pdf/2011.09586)}
 }
 
 ---
