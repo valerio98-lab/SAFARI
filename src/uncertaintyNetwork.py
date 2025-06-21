@@ -26,15 +26,15 @@ class DenoisingAutoencoder(nn.Module):
 
     def forward(self, x: torch.Tensor, add_noise: bool = True) -> torch.Tensor:
         noisy_x = x + (torch.randn_like(x) * self.noise_std) if add_noise else x
+        noisy_x = noisy_x.to(dtype=torch.float32)
         input_encoded = self.encoder(noisy_x)
         return self.decoder(input_encoded)
 
     def get_noise_std(self) -> float:
         return self.noise_std
 
-    def reconstruction_error(self, x: Tensor) -> Tensor:
-        recon = self.forward(x, add_noise=False)
-        return ((x - recon) ** 2).sum(dim=1)
+    def reconstruction_error(self, truth: Tensor, recon: Tensor) -> Tensor:
+        return ((recon - truth) ** 2).mean(dim=1)
 
 
 class Encoder(nn.Module):
@@ -101,8 +101,8 @@ class UncertaintyTrainer:
         ):
             total_loss = 0.0
             for noisy, clean in self.dataloader:
-                noisy = noisy.to(self.device)
-                clean = clean.to(self.device)
+                noisy = noisy.to(self.device).float()
+                clean = clean.to(self.device).float()
                 self.optimizer.zero_grad()
 
                 outputs = self.model(noisy)
@@ -126,7 +126,8 @@ class UncertaintyTrainer:
             for noisy, clean in dataloader:
                 noisy = noisy.to(self.device)
                 clean = clean.to(self.device)
-                err = model.reconstruction_error(clean)
+                recon = model(noisy, add_noise=False)
+                err = model.reconstruction_error(clean, recon)
                 errors.append(err)
         return torch.cat(errors).mean().item()
 

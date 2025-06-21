@@ -25,6 +25,7 @@ class DynamicsNetwork(nn.Module):
 
     def forward(self, action: torch.Tensor, state: torch.Tensor) -> torch.Tensor:
         x = torch.cat((action, state), dim=-1)
+        x = x.float()
         return self.network(x)
 
 
@@ -76,13 +77,13 @@ class DynamicsTrainer:
 
     def train(self):
         self.model.train()
-        for epoch in tqdm(range(self.epochs), desc="Training Epochs"):
+        for epoch in tqdm(range(self.epochs), desc="Training Dynamics"):
             total_loss = 0.0
             for states, actions, deltas in self.dataloader:
                 states, actions, deltas = (
-                    states.to(self.device),
-                    actions.to(self.device),
-                    deltas.to(self.device),
+                    states.to(self.device).float(),
+                    actions.to(self.device).float(),
+                    deltas.to(self.device).float(),
                 )
                 self.optimizer.zero_grad()
                 predictions = self.model(actions, states)
@@ -98,9 +99,9 @@ class DynamicsTrainer:
 if __name__ == "__main__":
 
     states, actions, next_states = (
-        torch.randn(10000, 50),
-        torch.randn(10000, 50),
-        torch.randn(10000, 50),
+        torch.randn(1000, 50),
+        torch.randn(1000, 50),
+        torch.randn(1000, 50),
     )
 
     dataset = DynamicsDataset(states, actions, next_states)

@@ -1,6 +1,12 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Dataset
+from torch.optim.optimizer import Optimizer
+from tqdm import tqdm
+
+"""
+
+"""
 
 
 class PolicyNetwork(nn.Module):
@@ -23,6 +29,7 @@ class PolicyNetwork(nn.Module):
         self.network = nn.Sequential(*layers)
 
     def forward(self, state: torch.Tensor) -> torch.Tensor:
+        state = state.float()
         return self.network(state)
 
 
@@ -60,10 +67,46 @@ class PolicyTrainer:
         device="cuda" if torch.cuda.is_available() else "cpu",
     ):
         self.model = model.to(device)
-        self.optimizer = optimizer
-        self.dataloader = dataloader
+        self.optimizer: Optimizer = optimizer
+        self.dataloader: DataLoader = dataloader
         self.epochs = epochs
         self.device = device
+        self.criterion = nn.MSELoss()
 
     def train(self):
-        pass
+        total_loss = 0
+        self.model.train()
+        for epoch in tqdm(range(self.epochs), desc="Training Policy"):
+            for state, action in self.dataloader:
+                state = state.to(self.device).float()
+                action = action.to(self.device).float()
+
+                self.optimizer.zero_grad()
+                action_pred = self.model(state)
+                loss = self.criterion(action_pred, action)
+                loss.backward()
+                self.optimizer.step()
+                total_loss += loss.item() * state.size(0)
+
+            avg = total_loss / len(self.dataloader.dataset)
+            print(f"Epoch {epoch + 1}/{self.epochs}, Avg Loss: {avg :.4f}")
+
+
+if __name__ == "__main__":
+
+    states, actions = (torch.randn(10000, 50), torch.randn(10000, 50))
+
+    dataset = PolicyDataset(states, actions)
+    model = PolicyNetwork(
+        state_dim=states.shape[1],
+        action_dim=actions.shape[1],
+        hidden_dim=128,
+        hidden_layers=4,
+    )
+    trainer = PolicyTrainer(
+        model=model,
+        optimizer=torch.optim.Adam(model.parameters(), lr=1e-3),
+        dataloader=DataLoader(dataset, batch_size=32, shuffle=True),
+        epochs=5,
+    )
+    trainer.train()
