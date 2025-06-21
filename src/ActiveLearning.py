@@ -233,32 +233,32 @@ class ActiveLearning:
 if __name__ == "__main__":
 
     policy_model = PolicyNetwork(
-        state_dim=348, action_dim=17, hidden_dim=256, hidden_layers=4
+        state_dim=23, action_dim=7, hidden_dim=256, hidden_layers=4
     )
     dynamics_model = DynamicsNetwork(
-        state_dim=348, action_dim=17, hidden_dim=256, hidden_layers=4
+        state_dim=23, action_dim=7, hidden_dim=256, hidden_layers=4
     )
     autoencoder = DenoisingAutoencoder(
-        input_dim=348, hidden_dim=256, hidden_layers=4, noise_std=0.1
+        input_dim=23, hidden_dim=256, hidden_layers=4, noise_std=0.1
     )
 
-    env = gym.make("Humanoid-v5", render_mode="human")
+    env = gym.make("Pusher-v5", render_mode="human")
     al = ActiveLearning(
         env=env,
         policy_model=policy_model,
         dynamics_model=dynamics_model,
         uncertainty_model=autoencoder,
-        actions=torch.randn(1, 17).to("cuda"),
-        states=torch.randn(1, 348).to("cuda"),
-        next_states=torch.randn(1, 348).to("cuda"),
-        state_dim=348,
-        actions_dim=17,
-        retrain_epochs=100,
-        threshold=1.5,
-        safe_threshold=0.5,
-        max_iterations=1000,
-        cem_iterations=20,
-        cem_horizon=30,
+        actions=torch.randn(1, 2).to("cuda"),
+        states=torch.randn(1, 23).to("cuda"),
+        next_states=torch.randn(1, 23).to("cuda"),
+        state_dim=23,
+        actions_dim=7,
+        retrain_epochs=1000,
+        threshold=2,
+        safe_threshold=1,
+        max_iterations=5000,
+        cem_iterations=1000,
+        cem_horizon=100,
         n_samples=1000,
         beta=0.5,
         elite_samples=100,

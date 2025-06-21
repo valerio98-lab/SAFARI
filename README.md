@@ -1,5 +1,5 @@
 # SAFARI
-Naive Re-implementation of Safe and Active Robot Imitation Learning with Imagination for reinforcement learning agents. Just for fun
+Naive Re-implementation of Safe and Active Robot Imitation Learning with Imagination for RL agents. Just for fun
 
 ## Project Structure so far
 
@@ -10,6 +10,10 @@ Naive Re-implementation of Safe and Active Robot Imitation Learning with Imagina
   - `uncertaintyNetwork.py`: Uncertainty estimation network.
 
 > **Note:** The core architecture and training pipeline are implemented, but the project is still incomplete.
+
+> **Note:** Currently the architecture is set to run on the env `Pusher-v5` 
+ 
+| ![](./pusher.gif) | 
 
 ## TODO
 
